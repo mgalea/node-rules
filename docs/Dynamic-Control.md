@@ -38,7 +38,6 @@ Where `rules` can be either an array of rule objects or a single array. But what
     RuleEngine.register(newrule);
     RuleEngine.register(newrule);
 
-
 ##### 4. `RuleEngine.findRules(<filter>)`
 This function is used to retrieve the Rules which are registered on the Rule engine which matches the filter we pass as its parameter. A sample usage can be like below.
 

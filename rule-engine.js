@@ -13,7 +13,7 @@ class RuleEngine {
         }
         return this;
     }
-    init(rules) {
+    init() {
         this.rules = [];
         this.activeRules = [];
     }
@@ -26,6 +26,12 @@ class RuleEngine {
         this.sync();
     }
     sync() {
+        for (var rule of this.rules) {
+            if (typeof (rule.priority) === "undefined") {
+                rule.priority = 0;
+            }
+        }
+
         this.activeRules = this.rules.filter(function (a) {
             if (typeof (a.on) === "undefined") {
                 a.on = true;
@@ -58,11 +64,11 @@ class RuleEngine {
                 "rule": function () { return _rules[x]; },
                 "whenTrue": function (outcome) {
                     if (outcome) {
-                        var _consequence = _rules[x].action;
-                        _consequence.ruleRef = _rules[x].id || _rules[x].name || 'index_' + x;
+                        var _action = _rules[x].action;
+                        _action.ruleRef = _rules[x].id || _rules[x].name || 'index_' + x;
                         thisHolder.nextTick(function () {
-                            matchPath.push(_consequence.ruleRef);
-                            _consequence.call(session, API, session);
+                            matchPath.push(_action.ruleRef);
+                            _action.call(session, API, session);
                         });
                     } else {
                         thisHolder.nextTick(function () {
@@ -72,11 +78,11 @@ class RuleEngine {
                 },
                 "whenFalse": function (outcome) {
                     if (!outcome) {
-                        var _consequence = _rules[x].action;
-                        _consequence.ruleRef = _rules[x].id || _rules[x].name || 'index_' + x;
+                        var _action = _rules[x].action;
+                        _action.ruleRef = _rules[x].id || _rules[x].name || 'index_' + x;
                         thisHolder.nextTick(function () {
-                            matchPath.push(_consequence.ruleRef);
-                            _consequence.call(session, API, session);
+                            matchPath.push(_action.ruleRef);
+                            _action.call(session, API, session);
                         });
                     } else {
                         thisHolder.nextTick(function () {
@@ -102,11 +108,43 @@ class RuleEngine {
                             return FnRuleLoop(x + 1);
                         });
                     }
+                },
+                "skip": function (n) {
+                    if (!ignoreFactChanges && !isEqual(lastSession, session)) {
+                        lastSession = clonedeep(session);
+                        thisHolder.nextTick(function () {
+                            API.restart();
+                        });
+                    } else {
+                        thisHolder.nextTick(function () {
+                            return FnRuleLoop(x + n);
+                        });
+                    }
+                },
+                "skipTo": function (id) {
+                    this.rules.filter(function (a) {
+                        if (typeof (a.id) === "undefined") {
+                            console.log('undefined rule');
+                        }
+                        if (a.on === true) {
+                            console.log(a);
+                        }
+                    });
+                    if (!ignoreFactChanges && !isEqual(lastSession, session)) {
+                        lastSession = clonedeep(session);
+                        thisHolder.nextTick(function () {
+                            API.restart();
+                        });
+                    } else {
+                        thisHolder.nextTick(function () {
+                            return FnRuleLoop(x + n);
+                        });
+                    }
                 }
             };
             _rules = thisHolder.activeRules;
-            if (x < _rules.length && complete === false) {
-                console.log('executing rule: '+x);
+            if (x < _rules.length && rules[x].priority >= 0 && complete === false) {
+                console.log('executing rule: ' + x);
                 var _rule = _rules[x].condition;
                 _rule.call(session, API, session);
             } else {
@@ -154,10 +192,37 @@ class RuleEngine {
         }
         this.sync();
     }
+    toJSON() {
+        return this.rules;
+    }
+    export() {
+        var json = JSON.stringify(this.rules, function (key, value) {
+            if (typeof value === "function") {
+                return "/Function(" + value.toString() + ")/";
+            }
+            return value;
+        }, 0
+        );
+        return json;
+    }
+    import(importString) {
+        var obj2 = JSON.parse(importString, function (key, value) {
+            if (typeof value === "string" &&
+                value.startsWith("/Function(") &&
+                value.endsWith(")/")) {
+                value = value.substring(10, value.length - 2);
+                return (0, eval)("(" + value + ")");
+            }
+            return value;
+        });
+        return obj2;
+    }
+
 };
 
 var rules = [
     {
+        priority: 2,
         "condition": function (R) {
             R.whenTrue(this.transactionTotal < 500);
         },
@@ -169,7 +234,7 @@ var rules = [
     },
     {
         "condition": function (R) {
-            R.whenFalse(this.application=="MT");
+            R.whenFalse(this.application == "MT");
         },
         "action": function (R) {
             this.result = false;
@@ -182,6 +247,7 @@ var rules = [
 
 /* Creating Rule Engine instance and registering rule */
 var R = new RuleEngine();
+var R2 = new RuleEngine();
 
 R.register(rules);
 /* Fact with less than 500 as transaction, and this should be blocked */
@@ -192,7 +258,10 @@ var fact = {
     "cardType": "Credit Card"
 };
 
-R.execute(fact, function (data) {
+console.dir(R.toJSON());
+R2.register(R.import(R.export()))
+
+R2.execute(fact, function (data) {
     if (data.result) {
         console.log("Valid transaction");
     } else {

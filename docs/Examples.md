@@ -1,3 +1,4 @@
+#Examples
 The example below shows how to use the rule engine to apply a sample rule on a specific fact. Rules fed into the rule engine may be as Array of rules or as individual rule objects.
 	
 ``` js
@@ -7,9 +8,9 @@ var RuleEngine = require('node-rules');
 //define the rules
 var rules = [{
 	"condition": function(R) {
-		R.when(this && (this.transactionTotal < 500));
+		R.whenTrue(this && (this.transactionTotal < 500));
 	},
-	"consequence": function(R) {
+	"action": function(R) {
 		this.result = false;
 		R.stop();
 	}
