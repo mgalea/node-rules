@@ -1,4 +1,4 @@
-var RuleEngine = require('../index');
+var RuleEngine = require('../rules-engine');
 /* Set of Rules to be applied
 First blocks a transaction if less than 500
 Second blocks a debit card transaction.*/
@@ -7,18 +7,18 @@ Rules will be applied as per their index in the array.
 If you need to enforce priority manually, then see examples with prioritized rules */
 var rules = [{
     "condition": function(R) {
-        R.when(this.transactionTotal < 500);
+        R.whenTrue(this.transactionTotal < 500);
     },
-    "consequence": function(R) {
+    "action": function(R) {
         this.result = false;
         this.reason = "The transaction was blocked as it was less than 500";
         R.stop();//stop if matched. no need to process next rule.
     }
 }, {
     "condition": function(R) {
-        R.when(this.cardType === "Debit");
+        R.whenTrue(this.cardType === "Debit");
     },
-    "consequence": function(R) {
+    "action": function(R) {
         this.result = false;
         this.reason = "The transaction was blocked as debit cards are not allowed";
         R.stop();

@@ -1,10 +1,10 @@
-var RuleEngine = require('../index');
+var RuleEngine = require('../rules-engine');
 /* Sample Rule to block a transaction if its below 500 */
 var rule = {
     "condition": function(R) {
-        R.when(this.transactionTotal < 500);
+        R.whenTrue(this.transactionTotal < 500);
     },
-    "consequence": function(R) {
+    "action": function(R) {
         this.result = false;
         this.reason = "The transaction was blocked as it was less than 500";
         R.stop();

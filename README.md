@@ -1,31 +1,39 @@
 Rules-Engine
 =====
 
-Node-rules is a light weight forward chaining Rule Engine, written in JavaScript.
+Rules-Engine is a light-weight, non-linear Rule Engine written in JavaScript. It is uses the great work of Mithun Satheesh's forward chaining Rule Engine, [node-rules](https://mithunsatheesh.github.io/node-rules). My version simply adds branching functionality and re-introduced importing and exporting. All credits for this work goes to Mithun Satheesh.
+
+Due to the many changes made to the original work, I have re-written many parts of the documentation. This version is backward compatible to [node-rules](https://mithunsatheesh.github.io/node-rules).
 
 #### Overview
 
-Node-rules takes rules written in JSON friendly format as input. Once the rule engine is running with rules registered on it, you can feed it facts and the rules will be applied one by one to generate an outcome.
+Rules-Engine takes rules written in JSON friendly format as input. Once the rule engine is running with rules registered on it, you can feed it facts and the rules will be applied one by one to generate an outcome.
 
 ###### 1. Defining a Rule
 
 A rule will consist of a condition and its corresponding consequence. You can find the explanation for various mandatory and optional parameters of a rule in [this wiki](docs/Rules).
 
 ``` js
-{
+{   
+    "priority": 1,
     "condition" : function(R) {
         R.whenTrue(this.transactionTotal < 500);
     },
     "action" : function(R) {
         this.result = false;
         R.stop();
+    },
+    "else" :  function(R) {  // The else di rective is optional
+        R.next();
     }
 }
 ```
 
-Here priority is an optional parameter which will be used to specify priority of a rule over other rules when there are multiple rules running. In the above rule `R.whenTrue` evaluates the truthfulness of the condition expression and `R.stop` used to stop further processing of the fact as we have arrived at a result.
+Here priority is an optional parameter which will be used to specify priority of a rule over other rules when there are multiple rules running. In the above rule `R.whenTrue` evaluates the truthfulness of the condition expression and `R.stop` used to stop further processing of the fact as we have arrived at a result. The original engine uses `R.when` which has been retained for backward compatibility and is equivalent to `R.whenTrue`.
 
-The functions `R.stop`, `R.whenTrue`, `R.whenFalse`,`R.next`, `R.restart` are part of the Flow Control API which allows user to control the Engine Flow. Read more about  [Flow Controls](docs/Flow-Control-API.md) in [wiki](/docs).
+In the original engine the `action` was defined by the `consequence` key whihc has been retained for backward compatibility. The reason for change is that now it is possible to trigger another process if `condition` is not met by using the `else` directive.
+
+The functions `R.stop`, `R.whenTrue`, `R.whenFalse`,`R.next`, `R.skip`,`R.goto`,`R.restart` are part of the Flow Control API which allows user to control the Engine Flow. Read more about  [Flow Controls](docs/Flow-Control-API.md) in [wiki](/docs).
 
 
 ###### 2. Defining a Fact

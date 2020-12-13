@@ -1,5 +1,5 @@
 var colors = require('colors');
-var RuleEngine = require('../index');
+var RuleEngine = require('../rules-engine');
 var rules = [
     /**** Rule 1 ****/
     {
@@ -32,7 +32,7 @@ var rules = [
     /**** Rule 3 ****/
     {
         "name": "block AME > 10000",
-        "priority": 4,
+        "priority": 5,
         "on": true,
         "condition": function(R) {
             R.when(this.cardType == "Credit Card" && this.cardIssuer == "American Express" && this.transactionTotal > 1000);
@@ -51,11 +51,11 @@ var rules = [
         "condition": function(R) {
             R.when(this.cardType == "Cash Card");
         },
-        "consequence": function(R) {
+        "action": function(R) {
             console.log("Rule 4 matched - reject the payment if cash card. Rejecting payment.");
             this.result = false;
             R.stop();
-        }
+        },
     },
     /**** Rule 5 ****/
     {
@@ -81,18 +81,19 @@ var rules = [
         },
         "consequence": function(R) {
             console.log("Rule 6 matched - support rule written for blocking payment above 10000 from guests.");
-            console.log("Process left to chain with rule 5.");
+            console.log("Process continues to chain with next rule (5).");
             this.customerType = "guest";
             R.next(); // the fact has been altered, so all rules will run again. No need to restart.
         }
     },
     /**** Rule 7 ****/
     {
-        "name": "block payment from specific app",
-        "priority": 5,
+        "name": "block payment",
+        "priority": 4,
         "on": true,
         "condition": function(R) {
             R.when(this.appCode && this.appCode === "MOBI4");
+
         },
         "consequence": function(R) {
             console.log("Rule 7 matched - block payment for Mobile. Reject Payment.");
@@ -111,7 +112,7 @@ var rules = [
         "consequence": function(R) {
             console.log("Rule 8 matched - the event is not critical, so accept");
             this.result = true;
-            R.stop();
+            R.next();
         }
     },
     /**** Rule 9 ****/
@@ -134,9 +135,9 @@ var rules = [
     {
         "name": "check if user's name is blacklisted",
         "priority": 1,
-        "on": true,
+        "on": false,
         "condition": function(R) {
-            var blacklist = ["user4"];
+            var blacklist = ["user2"];
             R.when(this && blacklist.indexOf(this.name) > -1);
         },
         "consequence": function(R) {
@@ -158,7 +159,7 @@ var user1 = {
     "cardType": "Cash Card",
     "cardIssuer": "OXI",
 };
-/** example of payment from blocked app, so payemnt blocked. ****/
+/** example of payment from blocked app, so payment blocked. ****/
 var user2 = {
     "userIP": "27.3.4.5",
     "name": "user2",
@@ -170,7 +171,7 @@ var user2 = {
     "cardType": "Credit Card",
     "cardIssuer": "VISA",
 };
-/** example of low priority event, so skips frther checks. ****/
+/** example of low priority event, so skips further checks. ****/
 var user3 = {
     "userIP": "27.3.4.5",
     "name": "user3",
@@ -218,14 +219,14 @@ var user6 = {
     "cardType": "Credit Card",
     "cardIssuer": "VISA",
 };
-/** example of a chaned up rule. will take two iterations. ****/
+/** example of a chained up rule. will take two iterations. ****/
 var user7 = {
     "userIP": "27.3.4.5",
     "name": "user7",
     "eventRiskFactor": 2,
     "userCredibility": 2,
     "appCode": "WEB1",
-    "userLoggedIn": false,
+    "userLoggedIn": true,
     "transactionTotal": 100000,
     "cardType": "Credit Card",
     "cardIssuer": "VISA",
@@ -242,18 +243,21 @@ var user8 = {
     "cardType": "Credit Card",
     "cardIssuer": "VISA",
 };
-var R = new RuleEngine(rules);
+var R = new RuleEngine(rules, {ignoreFactChanges:true, debug:true} );
 console.log("----------".blue);
 console.log("start execution of rules".blue);
 console.log("----------".blue);
-R.execute(user7, function(result) {
-    if (result.result) console.log("Completed", "User7 Accepted".green);
-    else console.log("Completed", "User7 Rejected".red);
+R.execute(user4, function(result) {
+    if (result.result) console.log("Completed", "User4 Accepted".green);
+    else console.log("Completed", "User4 Rejected".red);
 });
+
+/*
 R.execute(user1, function(result) {
     if (result.result) console.log("Completed", "User1 Accepted".green);
     else console.log("Completed", "User1 Rejected".red);
 });
+
 R.execute(user2, function(result) {
     if (result.result) console.log("Completed", "User2 Accepted".green);
     else console.log("Completed", "User2 Rejected".red);
@@ -274,7 +278,13 @@ R.execute(user6, function(result) {
     if (result.result) console.log("Completed", "User6 Accepted".green);
     else console.log("Completed", "User6 Rejected".red);
 });
+R.execute(user7, function(result) {
+    if (result.result) console.log("Completed", "User7 Accepted".green);
+    else console.log("Completed", "User7 Rejected".red);
+
+});
 R.execute(user8, function(result) {
     if (result.result) console.log("Completed", "User8 Accepted".green);
     else console.log("Completed", "User8 Rejected".red);
 });
+*/

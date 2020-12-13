@@ -1,4 +1,4 @@
-var RuleEngine = require('../index');
+var RuleEngine = require('../rules-engine');
 /* Set of Rules to be applied */
 var rules = [{
     "priority": 4,

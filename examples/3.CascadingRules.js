@@ -1,19 +1,19 @@
-var RuleEngine = require('../index');
+var RuleEngine = require('../rules-engine');
 /* Here we can see a rule which upon matching its condition,
 does some processing and passes it to other rules for processing */
 var rules = [{
     "condition": function(R) {
-        R.when(this.application === "MOB");
+        R.whenTrue(this.application === "MOB");
     },
-    "consequence": function(R) {
+    "action": function(R) {
         this.isMobile = true;
-        R.next();//we just set a value on to fact, now lests process rest of rules
+        R.next();//we just set a value on to fact, now let's process rest of rules
     }
 }, {
     "condition": function(R) {
-        R.when(this.cardType === "Debit");
+        R.whenTrue(this.cardType === "Debit");
     },
-    "consequence": function(R) {
+    "action": function(R) {
         this.result = false;
         this.reason = "The transaction was blocked as debit cards are not allowed";
         R.stop();
