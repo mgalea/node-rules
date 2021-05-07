@@ -1,0 +1,54 @@
+[
+    {
+        "name": "Daily Reports (Uncompressed)",
+        "coverage": [
+            "GE"
+        ],
+        "encoding": "utf8",
+        "revision": 1,
+        "filename": {
+            "construct": [
+                "oper_id",
+                "year",
+                "month",
+                "day",
+                "hour",
+                "minute",
+                "second",
+                "identifier",
+                "version"
+            ],
+            "ext": "xml",
+            "pattern": {
+                "oper_id": "[0-9]{4}",
+                "year": "20[2-9][0-9]",
+                "month": "(0[1-9])|(1[0-2])",
+                "identifier": "B2[B|C]TP[1-4]SmryCompliance",
+                "version": "V?[0-9]{2}"
+            },
+            "splitter": "_",
+            "rule": [
+                {
+                    "rule1": "parseInt(year)>=2021"
+                }
+            ]
+        },
+        "processor": "xml_validator"
+    },
+    {
+        "name": "Daily Reports (Compressed)",
+        "coverage": [
+            "GE"
+        ],
+        "encoding": "gzip",
+        "revision": 1,
+        "filename": {
+            "ext": "zip",
+            "pattern": {
+                "identifier": "B2[B|C]TP[1-4]SmryCompliance"
+            },
+            "processor": "decompressor",
+            "saveas": "xml"
+        }
+    }
+]

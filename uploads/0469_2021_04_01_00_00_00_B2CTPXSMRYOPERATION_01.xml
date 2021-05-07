@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rsg:Report xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rsi="rsi" xmlns:rge="rge" xsi:schemaLocation="http://www.rsi.ge/schema/4_0/OprSmry B2CTpXSmryOperation.xsd" xmlns:rsg="http://www.rsi.ge/schema/4_0/OprSmry">
+  <Header>
+    <rsi:Tp>Report</rsi:Tp>
+    <rsi:PrdTp>Periodic</rsi:PrdTp>
+    <rsi:Ctgy>Summary</rsi:Ctgy>
+    <rsi:CrtDtTm>2021-05-04T13:22:36</rsi:CrtDtTm>
+    <rsi:RprtStrtDt>2021-04-01T00:00:00</rsi:RprtStrtDt>
+    <rsi:RptPrd>P1M</rsi:RptPrd>
+    <rsi:RprtToCntry>GE</rsi:RprtToCntry>
+    <rsi:RprtOprtr>19-04/69</rsi:RprtOprtr>
+    <rsi:VrsNb>01</rsi:VrsNb>
+  </Header>
+  <B2COprSmry>
+    <rge:TtlPlyrNmbr>365687</rge:TtlPlyrNmbr>
+    <rge:TtlActvPlyrNmbr>219047</rge:TtlActvPlyrNmbr>
+    <rge:OpnBlncAmt>12177370.07</rge:OpnBlncAmt>
+    <rge:TtlDpstsAmt>147888916.08</rge:TtlDpstsAmt>
+    <rge:TtlWthdrwAmt>111406132.67</rge:TtlWthdrwAmt>
+    <rge:TtlBetStkAmt>65271171.23</rge:TtlBetStkAmt>
+    <rge:TtlBetPytAmt>57619360.23</rge:TtlBetPytAmt>
+    <rge:TtlBetVdAmt>251753.14</rge:TtlBetVdAmt>
+    <rge:TtlGmWgrAmt>1016164382.46</rge:TtlGmWgrAmt>
+    <rge:TtlGmWinningsAmt>978732610.45</rge:TtlGmWinningsAmt>
+    <rge:TtlGrossFeeAmt>831473.83</rge:TtlGrossFeeAmt>
+    <rge:TtlTrnmtFeeAmt>179920.34</rge:TtlTrnmtFeeAmt>
+    <rge:TtlFreeWagersAmt>4299010.82</rge:TtlFreeWagersAmt>
+    <rge:TtlOvrlysAmt>15932.68</rge:TtlOvrlysAmt>
+    <rge:TtlJckptAmt>34821.07</rge:TtlJckptAmt>
+    <rge:ClsBlncAmt>8378287.51</rge:ClsBlncAmt>
+  </B2COprSmry>
+</rsg:Report>
